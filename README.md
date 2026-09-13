@@ -1,1 +1,1 @@
-# techstore_E-commerce
+# TechStore E-commerce
