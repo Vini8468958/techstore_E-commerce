@@ -1,0 +1,55 @@
+import { createContext, useContext, useMemo, useState, type ReactNode } from 'react'
+import type { User } from '../types'
+
+type AuthContextValue = {
+  user: User | null
+  login: (email: string, password: string) => Promise<User>
+  register: (name: string, email: string, password: string) => Promise<User>
+  logout: () => void
+  updateName: (name: string) => void
+}
+
+const AuthContext = createContext<AuthContextValue | null>(null)
+
+const getInitialUser = (): User | null => {
+  const raw = localStorage.getItem('techstore_user')
+  if (!raw) return null
+  try { return JSON.parse(raw) as User } catch { return null }
+}
+
+export function AuthProvider({ children }: { children: ReactNode }) {
+  const [user, setUser] = useState<User | null>(getInitialUser)
+
+  const persist = (value: User | null) => {
+    setUser(value)
+    if (value) localStorage.setItem('techstore_user', JSON.stringify(value))
+    else localStorage.removeItem('techstore_user')
+  }
+
+  const login = async (email: string, password: string) => {
+    if (!email || !password) throw new Error('Informe e-mail e senha.')
+    await new Promise(resolve => setTimeout(resolve, 350))
+    const isAdmin = email.toLowerCase().includes('admin')
+    const next: User = { id: isAdmin ? 1 : 2, name: isAdmin ? 'Administrador' : 'Cliente TechStore', email, role: isAdmin ? 'ADMIN' : 'CUSTOMER' }
+    persist(next)
+    return next
+  }
+
+  const register = async (name: string, email: string, password: string) => {
+    if (!name || !email || password.length < 6) throw new Error('Preencha os dados e use uma senha com pelo menos 6 caracteres.')
+    await new Promise(resolve => setTimeout(resolve, 350))
+    const next: User = { id: Date.now(), name, email, role: 'CUSTOMER' }
+    persist(next)
+    return next
+  }
+
+  const updateName = (name: string) => user && persist({ ...user, name })
+  const value = useMemo(() => ({ user, login, register, logout: () => persist(null), updateName }), [user])
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
+}
+
+export function useAuth() {
+  const ctx = useContext(AuthContext)
+  if (!ctx) throw new Error('useAuth deve ser usado dentro de AuthProvider')
+  return ctx
+}
