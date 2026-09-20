@@ -1,3 +1,16 @@
+import { Routes, Route } from 'react-router-dom'
+import Layout from './components/Layout.tsx'
+import { ProtectedRoute, AdminRoute } from './components/RouteGuards.tsx'
+import HomePage from './pages/HomePage.tsx'
+import ProductsPage from './pages/ProductsPage.tsx'
+import ProductDetailsPage from './pages/ProductDetailsPage.tsx'
+import CartPage from './pages/CartPage.tsx'
+import { LoginPage, RegisterPage } from './pages/AuthPages.tsx'
+import CheckoutPage from './pages/CheckoutPage.tsx'
+import OrdersPage from './pages/OrdersPage.tsx'
+import ProfilePage from './pages/ProfilePage.tsx'
+import AdminPage from './pages/AdminPage.tsx'
+import NotFoundPage from './pages/NotFoundPage.tsx'
 import { useState } from 'react'
 import heroImg from './assets/hero.png'
 import reactLogo from './assets/react.svg'
@@ -119,4 +132,20 @@ function App() {
   )
 }
 
-export default App
+export default function App(){
+  return <Routes>
+    <Route element={<Layout />}>
+      <Route path="/" element={<HomePage />} />
+      <Route path="/produtos" element={<ProductsPage />} />
+      <Route path="/produtos/:id" element={<ProductDetailsPage />} />
+      <Route path="/carrinho" element={<CartPage />} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/cadastro" element={<RegisterPage />} />
+      <Route path="/checkout" element={<ProtectedRoute><CheckoutPage /></ProtectedRoute>} />
+      <Route path="/pedidos" element={<ProtectedRoute><OrdersPage /></ProtectedRoute>} />
+      <Route path="/perfil" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+      <Route path="/admin" element={<AdminRoute><AdminPage /></AdminRoute>} />
+      <Route path="*" element={<NotFoundPage />} />
+    </Route>
+  </Routes>
+}
