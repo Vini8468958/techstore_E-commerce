@@ -14,8 +14,6 @@ dist/
 !.env.example
 .DS_Store
 .vscode/
-dist-ssr
-*.local
 
 # Editor directories and files
 .vscode/*
