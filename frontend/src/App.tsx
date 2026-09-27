@@ -1,3 +1,9 @@
+/**
+ * Componente responsável pelo mapa de rotas da aplicação.
+ * Cada <Route> associa uma URL a uma página e alguns caminhos usam
+ * proteções para exigir login ou perfil de administrador.
+ */
+
 import { Routes, Route } from 'react-router-dom'
 import Layout from './components/Layout'
 import { ProtectedRoute, AdminRoute } from './components/RouteGuards'
@@ -12,8 +18,10 @@ import ProfilePage from './pages/ProfilePage'
 import AdminPage from './pages/AdminPage'
 import NotFoundPage from './pages/NotFoundPage'
 
+// O App apenas descreve a árvore de rotas da SPA.
 export default function App(){
   return <Routes>
+    {/* Todas estas páginas compartilham Header e Footer definidos em Layout. */}
     <Route element={<Layout />}>
       <Route path="/" element={<HomePage />} />
       <Route path="/produtos" element={<ProductsPage />} />
@@ -21,10 +29,13 @@ export default function App(){
       <Route path="/carrinho" element={<CartPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/cadastro" element={<RegisterPage />} />
+      {/* Checkout exige autenticação. */}
       <Route path="/checkout" element={<ProtectedRoute><CheckoutPage /></ProtectedRoute>} />
       <Route path="/pedidos" element={<ProtectedRoute><OrdersPage /></ProtectedRoute>} />
       <Route path="/perfil" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+      {/* Área administrativa exige role ADMIN. */}
       <Route path="/admin" element={<AdminRoute><AdminPage /></AdminRoute>} />
+      {/* * funciona como rota coringa para URLs inexistentes. */}
       <Route path="*" element={<NotFoundPage />} />
     </Route>
   </Routes>

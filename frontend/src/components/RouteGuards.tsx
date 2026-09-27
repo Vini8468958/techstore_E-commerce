@@ -1,3 +1,8 @@
+/**
+ * Componentes de proteção de rotas.
+ * ProtectedRoute exige usuário autenticado; AdminRoute exige usuário ADMIN.
+ */
+
 import { Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import type { ReactNode } from 'react'

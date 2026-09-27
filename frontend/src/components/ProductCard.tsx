@@ -1,3 +1,8 @@
+/**
+ * Card reutilizável para exibir um produto no catálogo ou na Home.
+ * Recebe um Product por props e permite adicioná-lo ao carrinho.
+ */
+
 import { Link } from 'react-router-dom'
 import type { Product } from '../types'
 import { money } from '../utils/format'

@@ -1,11 +1,21 @@
+/**
+ * Página inicial do e-commerce.
+ * Busca os produtos pelo serviço mock, seleciona os destaques e monta as
+ * principais seções visuais da loja.
+ */
+
 import { Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import ProductCard from '../components/ProductCard'
 import { productService } from '../services/mockApi'
 
+// Página carregada na rota '/'.
 export default function HomePage() {
+  // useQuery busca os produtos e mantém o resultado em cache.
   const { data: products = [] } = useQuery({ queryKey: ['products'], queryFn: productService.list })
+  // Mostra no máximo quatro produtos marcados como destaque.
   const featured = products.filter(p => p.featured).slice(0, 4)
+  // As seções seguintes compõem a Home: hero, categorias, destaques e benefícios.
   return (
     <>
       <section className="hero">

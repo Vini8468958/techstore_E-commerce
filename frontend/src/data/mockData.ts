@@ -1,5 +1,11 @@
+/**
+ * Dados fictícios usados enquanto não existe uma API/backend real conectado.
+ * Esses objetos simulam registros que futuramente podem vir do banco de dados.
+ */
+
 import type { Product, Order } from '../types'
 
+// Catálogo inicial usado pelo mockApi quando ainda não há produtos salvos no localStorage.
 export const products: Product[] = [
   { id: 1, name: 'Notebook Nitro V15', description: 'Notebook gamer com tela 15.6” 144Hz, ótimo para jogos, estudos e desenvolvimento.', price: 4999.9, oldPrice: 5599.9, stock: 8, category: 'Notebooks', brand: 'Acer', rating: 4.8, reviews: 184, emoji: '💻', badge: 'Oferta', featured: true },
   { id: 2, name: 'MacBook Air M4', description: 'Ultrafino, silencioso e com excelente autonomia para produtividade e desenvolvimento.', price: 8999.9, stock: 5, category: 'Notebooks', brand: 'Apple', rating: 4.9, reviews: 93, emoji: '💻', featured: true },
@@ -15,6 +21,7 @@ export const products: Product[] = [
   { id: 12, name: 'AirPods Pro', description: 'Fone true wireless com cancelamento ativo de ruído e áudio espacial.', price: 1899.9, stock: 15, category: 'Áudio', brand: 'Apple', rating: 4.8, reviews: 530, emoji: '🎧' }
 ]
 
+// Pedidos fictícios usados apenas para demonstrar a tela de histórico.
 export const mockOrders: Order[] = [
   { id: '#TS-1048', date: '08/09/2026', status: 'Entregue', total: 5749.8, items: [
     { name: 'Notebook Nitro V15', quantity: 1, unitPrice: 4999.9, emoji: '💻' },

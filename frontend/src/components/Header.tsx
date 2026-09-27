@@ -1,3 +1,8 @@
+/**
+ * Cabeçalho principal da loja.
+ * Exibe navegação, estado de login, acesso ao perfil e quantidade do carrinho.
+ */
+
 import { NavLink, Link, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import { useCart } from '../contexts/CartContext'

@@ -1,17 +1,28 @@
+/**
+ * Página de catálogo.
+ * Permite pesquisar, filtrar por categoria e ordenar os produtos carregados.
+ */
+
 import { useMemo, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useSearchParams } from 'react-router-dom'
 import ProductCard from '../components/ProductCard'
 import { productService } from '../services/mockApi'
 
+// Estado e dados necessários para controlar o catálogo.
 export default function ProductsPage() {
+  // Carrega os produtos e informa se a busca ainda está acontecendo.
   const { data: products = [], isLoading } = useQuery({ queryKey: ['products'], queryFn: productService.list })
+  // Lê/escreve filtros na URL, por exemplo ?categoria=Hardware.
   const [params, setParams] = useSearchParams()
+  // Texto digitado na barra de busca.
   const [search, setSearch] = useState('')
+  // Critério selecionado para ordenar o catálogo.
   const [sort, setSort] = useState('relevance')
   const category = params.get('categoria') || 'Todas'
   const categories = ['Todas', ...Array.from(new Set(products.map(p => p.category)))]
 
+  // useMemo recalcula a lista apenas quando produtos/filtros realmente mudam.
   const filtered = useMemo(() => {
     let list = products.filter(p => (category === 'Todas' || p.category === category) && (p.name + p.brand + p.description).toLowerCase().includes(search.toLowerCase()))
     if (sort === 'price-asc') list = [...list].sort((a,b) => a.price - b.price)

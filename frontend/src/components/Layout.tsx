@@ -1,3 +1,8 @@
+/**
+ * Layout compartilhado pelas páginas da loja.
+ * O <Outlet /> é o ponto onde o React Router renderiza a página atual.
+ */
+
 import { Outlet } from 'react-router-dom'
 import Header from './Header'
 

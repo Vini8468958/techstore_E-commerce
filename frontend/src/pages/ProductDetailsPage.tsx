@@ -1,3 +1,9 @@
+/**
+ * Página de detalhes de um produto.
+ * Lê o id da URL, busca o item correspondente e controla a quantidade antes
+ * de adicioná-lo ao carrinho.
+ */
+
 import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
@@ -5,11 +11,16 @@ import { productService } from '../services/mockApi'
 import { money } from '../utils/format'
 import { useCart } from '../contexts/CartContext'
 
+// A rota /produtos/:id fornece o identificador do item a ser exibido.
 export default function ProductDetailsPage() {
+  // useParams captura o parâmetro dinâmico :id da URL.
   const { id } = useParams()
   const { add } = useCart()
+  // Quantidade que o usuário pretende adicionar ao carrinho.
   const [qty, setQty] = useState(1)
+  // Busca somente o produto correspondente ao id da rota.
   const { data: product, isLoading } = useQuery({ queryKey: ['product', id], queryFn: () => productService.getById(Number(id)) })
+  // Estados alternativos evitam renderizar detalhes antes dos dados existirem.
   if (isLoading) return <div className="container loader">Carregando produto...</div>
   if (!product) return <div className="container empty-state"><h2>Produto não encontrado.</h2><Link to="/produtos" className="btn btn-primary">Voltar ao catálogo</Link></div>
   return <section className="section"><div className="container"><div className="breadcrumbs"><Link to="/">Início</Link> / <Link to="/produtos">Produtos</Link> / <span>{product.name}</span></div><div className="product-detail-grid">
