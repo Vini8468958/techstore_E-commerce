@@ -1,0 +1,33 @@
+/**
+ * Painel administrativo do projeto.
+ * Demonstra métricas e um CRUD local de produtos usando React Query + mockApi.
+ */
+
+import { useState, type FormEvent } from 'react'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { productService } from '../services/mockApi'
+import { money } from '../utils/format'
+import type { Product, Category } from '../types'
+
+// Modelo utilizado para inicializar o formulário de um novo produto.
+const emptyProduct: Product = { id: 0, name: '', description: '', price: 0, stock: 0, category: 'Notebooks', brand: '', rating: 5, reviews: 0, emoji: '📦' }
+
+// Página disponível somente para role ADMIN por meio de AdminRoute.
+export default function AdminPage() {
+  // QueryClient permite invalidar o cache após salvar ou remover produtos.
+  const qc=useQueryClient(); const {data:products=[]}=useQuery({queryKey:['products'],queryFn:productService.list}); const [editing,setEditing]=useState<Product|null>(null); const [form,setForm]=useState<Product>(emptyProduct)
+  // Mutation usada para criar/editar e depois atualizar a lista exibida.
+  const saveMutation=useMutation({mutationFn:productService.save,onSuccess:()=>{qc.invalidateQueries({queryKey:['products']});setEditing(null);setForm(emptyProduct)}})
+  // Mutation usada para excluir um item e invalidar a query de produtos.
+  const removeMutation=useMutation({mutationFn:productService.remove,onSuccess:()=>qc.invalidateQueries({queryKey:['products']})})
+  // Abre o modal com um produto vazio; edit() abre com dados existentes.
+  const startNew=()=>{setEditing(emptyProduct);setForm({...emptyProduct,id:Date.now()})}; const edit=(p:Product)=>{setEditing(p);setForm({...p})}
+  // Envia o estado atual do formulário para a mutation de salvamento.
+  const submit=(e:FormEvent)=>{e.preventDefault();saveMutation.mutate(form)}
+  // Métricas derivadas da lista atual de produtos.
+  const stockLow=products.filter(p=>p.stock<10).length; const inventory=products.reduce((sum,p)=>sum+p.stock*p.price,0)
+  return <section className="section admin-section"><div className="container"><div className="admin-header"><div><span className="eyebrow">Painel administrativo</span><h1>Visão geral da loja</h1></div><button className="btn btn-primary" onClick={startNew}>+ Novo produto</button></div><div className="metrics"><div className="metric"><span>📦</span><div><small>Produtos</small><strong>{products.length}</strong></div></div><div className="metric"><span>⚠️</span><div><small>Estoque baixo</small><strong>{stockLow}</strong></div></div><div className="metric"><span>💰</span><div><small>Valor em estoque</small><strong>{money(inventory)}</strong></div></div><div className="metric"><span>🧾</span><div><small>Pedidos hoje</small><strong>18</strong></div></div></div>
+  <div className="panel admin-table-wrap"><div className="panel-title"><h3>Produtos</h3><span>CRUD local demonstrativo</span></div><div className="table-scroll"><table className="admin-table"><thead><tr><th>Produto</th><th>Categoria</th><th>Preço</th><th>Estoque</th><th>Ações</th></tr></thead><tbody>{products.map(p=><tr key={p.id}><td><div className="table-product"><span>{p.emoji}</span><div><strong>{p.name}</strong><small>{p.brand}</small></div></div></td><td>{p.category}</td><td>{money(p.price)}</td><td><span className={p.stock<10?'stock-pill low':'stock-pill'}>{p.stock}</span></td><td><button className="table-btn" onClick={()=>edit(p)}>Editar</button><button className="table-btn danger" onClick={()=>{if(confirm('Remover este produto?'))removeMutation.mutate(p.id)}}>Excluir</button></td></tr>)}</tbody></table></div></div>
+  {editing&&<div className="modal-backdrop" onMouseDown={()=>setEditing(null)}><div className="modal" onMouseDown={e=>e.stopPropagation()}><div className="modal-head"><h2>{editing.id===form.id && products.some(p=>p.id===editing.id)?'Editar produto':'Novo produto'}</h2><button onClick={()=>setEditing(null)}>×</button></div><form onSubmit={submit} className="form"><div className="form-grid"><label className="wide">Nome<input value={form.name} onChange={e=>setForm({...form,name:e.target.value})} required /></label><label>Marca<input value={form.brand} onChange={e=>setForm({...form,brand:e.target.value})} required /></label><label>Categoria<select value={form.category} onChange={e=>setForm({...form,category:e.target.value as Category})}>{['Notebooks','Smartphones','Hardware','Periféricos','Áudio'].map(c=><option key={c}>{c}</option>)}</select></label><label>Preço<input type="number" step="0.01" value={form.price} onChange={e=>setForm({...form,price:Number(e.target.value)})} required /></label><label>Estoque<input type="number" value={form.stock} onChange={e=>setForm({...form,stock:Number(e.target.value)})} required /></label><label>Emoji<input value={form.emoji} onChange={e=>setForm({...form,emoji:e.target.value})} /></label><label className="wide">Descrição<textarea rows={4} value={form.description} onChange={e=>setForm({...form,description:e.target.value})} required /></label></div><div className="modal-actions"><button type="button" className="btn btn-ghost" onClick={()=>setEditing(null)}>Cancelar</button><button className="btn btn-primary" disabled={saveMutation.isPending}>{saveMutation.isPending?'Salvando...':'Salvar produto'}</button></div></form></div></div>}
+  </div></section>
+}
