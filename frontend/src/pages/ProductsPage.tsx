@@ -7,7 +7,7 @@ import { useMemo, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useSearchParams } from 'react-router-dom'
 import ProductCard from '../components/ProductCard'
-import { productService } from '../services/mockApi'
+import { productService } from '../services/api'
 
 // Estado e dados necessários para controlar o catálogo.
 export default function ProductsPage() {
@@ -27,7 +27,7 @@ export default function ProductsPage() {
     let list = products.filter(p => (category === 'Todas' || p.category === category) && (p.name + p.brand + p.description).toLowerCase().includes(search.toLowerCase()))
     if (sort === 'price-asc') list = [...list].sort((a,b) => a.price - b.price)
     if (sort === 'price-desc') list = [...list].sort((a,b) => b.price - a.price)
-    if (sort === 'rating') list = [...list].sort((a,b) => b.rating - a.rating)
+    if (sort === 'rating') list = [...list].sort((a,b) => (b.rating ?? 0) - (a.rating ?? 0))
     return list
   }, [products, category, search, sort])
 

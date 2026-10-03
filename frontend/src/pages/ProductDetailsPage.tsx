@@ -7,7 +7,7 @@
 import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { productService } from '../services/mockApi'
+import { productService } from '../services/api'
 import { money } from '../utils/format'
 import { useCart } from '../contexts/CartContext'
 
@@ -19,15 +19,15 @@ export default function ProductDetailsPage() {
   // Quantidade que o usuário pretende adicionar ao carrinho.
   const [qty, setQty] = useState(1)
   // Busca somente o produto correspondente ao id da rota.
-  const { data: product, isLoading } = useQuery({ queryKey: ['product', id], queryFn: () => productService.getById(Number(id)) })
+  const { data: product, isLoading } = useQuery({ queryKey: ['product', id], queryFn: () => productService.getById(id || '') })
   // Estados alternativos evitam renderizar detalhes antes dos dados existirem.
   if (isLoading) return <div className="container loader">Carregando produto...</div>
   if (!product) return <div className="container empty-state"><h2>Produto não encontrado.</h2><Link to="/produtos" className="btn btn-primary">Voltar ao catálogo</Link></div>
   return <section className="section"><div className="container"><div className="breadcrumbs"><Link to="/">Início</Link> / <Link to="/produtos">Produtos</Link> / <span>{product.name}</span></div><div className="product-detail-grid">
-    <div className="detail-visual"><div className="detail-emoji">{product.emoji}</div><div className="visual-caption">{product.category} • {product.brand}</div></div>
-    <div className="detail-info"><span className="eyebrow">{product.brand} • {product.category}</span><h1>{product.name}</h1><div className="rating large">★ {product.rating} <span>({product.reviews} avaliações)</span></div><p className="detail-description">{product.description}</p><hr />
+    <div className="detail-visual">{product.imageUrl ? <img src={product.imageUrl} alt={product.name} style={{ width: '100%', height: '100%', minHeight: 320, objectFit: 'contain', borderRadius: 18 }} /> : <div className="detail-emoji">{product.emoji}</div>}<div className="visual-caption">{product.category}{product.brand ? ` • ${product.brand}` : ''}</div></div>
+    <div className="detail-info"><span className="eyebrow">{product.brand ? `${product.brand} • ` : ''}{product.category}</span><h1>{product.name}</h1>{(product.rating ?? 0) > 0 && <div className="rating large">★ {product.rating} <span>({product.reviews ?? 0} avaliações)</span></div>}<p className="detail-description">{product.description}</p><hr />
       {product.oldPrice && <div className="old-price large">{money(product.oldPrice)}</div>}<div className="detail-price">{money(product.price)}</div><p className="installment">10x de {money(product.price/10)} sem juros</p>
-      <div className="stock ok">● Em estoque: {product.stock} unidades</div><div className="buy-row"><div className="qty"><button onClick={() => setQty(q => Math.max(1,q-1))}>−</button><span>{qty}</span><button onClick={() => setQty(q => Math.min(product.stock,q+1))}>+</button></div><button className="btn btn-primary grow" onClick={() => add(product, qty)}>Adicionar ao carrinho</button></div>
+      <div className="stock ok">● {product.stock > 0 ? `Em estoque: ${product.stock} unidades` : 'Produto indisponível'}</div><div className="buy-row"><div className="qty"><button disabled={product.stock<1} onClick={() => setQty(q => Math.max(1,q-1))}>−</button><span>{qty}</span><button disabled={product.stock<1} onClick={() => setQty(q => Math.min(product.stock,q+1))}>+</button></div><button className="btn btn-primary grow" disabled={product.stock<1} onClick={() => void add(product, qty).catch(error => alert((error as Error).message))}>{product.stock<1?'Indisponível':'Adicionar ao carrinho'}</button></div>
       <div className="secure-box"><span>🔒</span><div><strong>Compra protegida</strong><p>Ambiente preparado para integração com pagamento e backend.</p></div></div>
     </div>
   </div><div className="detail-tabs"><h2>Sobre este produto</h2><p>{product.description}</p><div className="spec-grid"><div><span>Marca</span><strong>{product.brand}</strong></div><div><span>Categoria</span><strong>{product.category}</strong></div><div><span>Avaliação</span><strong>{product.rating}/5</strong></div><div><span>Estoque</span><strong>{product.stock} un.</strong></div></div></div></div></section>
