@@ -4,24 +4,25 @@
  * produtos, usuários, pedidos e itens do carrinho.
  */
 
-// Papéis de acesso permitidos no sistema.
 export type Role = 'CUSTOMER' | 'ADMIN'
+export type Category = string
+export type EntityId = string | number
 
-// Categorias aceitas pelos produtos.
-export type Category = 'Notebooks' | 'Smartphones' | 'Hardware' | 'Periféricos' | 'Áudio'
-
-// Estrutura de um produto exibido e administrado na loja.
 export interface Product {
-  id: number
+  id: EntityId
   name: string
   description: string
   price: number
   oldPrice?: number
   stock: number
   category: Category
-  brand: string
-  rating: number
-  reviews: number
+  categoryId?: string
+  slug?: string
+  sku?: string
+  imageUrl?: string
+  brand?: string
+  rating?: number
+  reviews?: number
   emoji: string
   badge?: string
   featured?: boolean
@@ -29,13 +30,14 @@ export interface Product {
 
 // Cada item do carrinho combina o produto com a quantidade desejada.
 export interface CartItem {
+  id?: string
   product: Product
   quantity: number
 }
 
 // Dados mínimos usados para representar o usuário autenticado.
 export interface User {
-  id: number
+  id: EntityId
   name: string
   email: string
   role: Role
@@ -45,7 +47,7 @@ export interface User {
 export interface Order {
   id: string
   date: string
-  status: 'Processando' | 'Enviado' | 'Entregue'
+  status: 'Processando' | 'Enviado' | 'Entregue' | 'Cancelado' | 'Pendente'
   total: number
   items: { name: string; quantity: number; unitPrice: number; emoji: string }[]
 }

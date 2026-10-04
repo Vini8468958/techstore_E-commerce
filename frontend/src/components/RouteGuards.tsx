@@ -9,15 +9,17 @@ import type { ReactNode } from 'react'
 
 // Impede acesso quando não existe usuário autenticado.
 export function ProtectedRoute({ children }: { children: ReactNode }) {
-  const { user } = useAuth()
+  const { user, loading } = useAuth()
   const location = useLocation()
+  if (loading) return <div className="container loader">Validando sua sessão...</div>
   if (!user) return <Navigate to="/login" replace state={{ from: location.pathname }} />
   return children
 }
 
 // Proteção adicional específica para usuários administradores.
 export function AdminRoute({ children }: { children: ReactNode }) {
-  const { user } = useAuth()
+  const { user, loading } = useAuth()
+  if (loading) return <div className="container loader">Validando sua sessão...</div>
   if (!user) return <Navigate to="/login" replace />
   // Usuários comuns são enviados de volta para a Home.
   if (user.role !== 'ADMIN') return <Navigate to="/" replace />
